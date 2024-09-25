@@ -21,14 +21,12 @@ wss.on("connection", (ws) => {
   ws.send("Hello from TypeScript server!");
 
   // Receive messages from the client
-  ws.on("message", (message: string) => {
+  ws.on("message", (message) => {
     console.log(`Received: ${message}`);
-    // Echo message back to client
-    ws.send(`Server echo: ${message}`);
     // Broadcast the message to all connected clients except the sender
     wss.clients.forEach((client) => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(`Broadcast: ${message}`);
+        client.send(message.toString());
       }
     });
   });
