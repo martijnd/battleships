@@ -1,6 +1,6 @@
 export function setup({ onMessage }: { onMessage: (message: string) => void }) {
   // Initialize WebSocket connection to the server
-  const socket = new WebSocket("ws://localhost:8080");
+  const socket = new WebSocket(import.meta.env.VITE_ENDPOINT_URL as string);
 
   // Connection opened
   socket.addEventListener("open", () => {

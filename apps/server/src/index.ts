@@ -1,7 +1,9 @@
 // src/server.ts
 import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import dotenv from "dotenv";
 
+dotenv.config({});
 // Create HTTP server
 const server = createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
@@ -38,6 +40,6 @@ wss.on("connection", (ws) => {
 });
 
 // Start the server
-server.listen(8080, () => {
-  console.log("Server is listening on port 8080");
+server.listen(process.env.APP_PORT, () => {
+  console.log(`Server is listening on port ${process.env.APP_PORT}`);
 });
