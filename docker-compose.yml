@@ -4,7 +4,7 @@ services:
       context: .
       target: nginx-client
     ports:
-      - '80:80'
+      - '3003:80'
     networks:
       - app-network
 
