@@ -3,8 +3,6 @@ services:
     build:
       context: .
       target: nginx-client
-    env_file:
-      - ./apps/client/.env.local
     ports:
       - '80:80'
     networks:
@@ -14,10 +12,8 @@ services:
     build:
       context: .
       target: node-server
-    env_file:
-      - ./apps/server/.env 
     ports:
-      - '3001:3001' 
+      - '3004:3004' 
     networks:
       - app-network
 
