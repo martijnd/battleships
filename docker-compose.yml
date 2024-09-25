@@ -1,0 +1,26 @@
+services:
+  client:
+    build:
+      context: .
+      target: nginx-client
+    env_file:
+      - ./apps/client/.env.local
+    ports:
+      - '80:80'
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: .
+      target: node-server
+    env_file:
+      - ./apps/server/.env 
+    ports:
+      - '3001:3001' 
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
