@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { setup } from './utils/socket';
+import Board from './components/Board.vue';
+import { IncomingEvent, OutgoingEvent } from './enums/Event';
+import { ref } from 'vue';
 
-const message = ref('');
-const received = ref('');
-const { sendMessage } = setup({ onMessage });
+const firedCoordsList = ref<{ x: number; y: number }[]>([]);
 
-function onMessage(message: string) {
-  console.log('Received message:', message);
-  received.value = message;
+const GAME_ID = 1;
+
+const { sendMessage } = setup({ onEvent, onConnected });
+
+function onConnected() {
+  sendMessage(OutgoingEvent.Join, { gameId: GAME_ID });
 }
 
-function onSubmit() {
-  sendMessage(message.value);
-  message.value = '';
+function onEvent(type: IncomingEvent, payload: { x: number, y: number }) {
+  if (type === IncomingEvent.PlayerFired) {
+    firedCoordsList.value = [...firedCoordsList.value, payload];
+  }
 }
 
 </script>
 
 <template>
   <div>
-    <form @submit.prevent="onSubmit">
-      <h2>Received: {{ received }}</h2>
-      <input type="text" v-model="message">
-      <button type="submit">Send</button>
-    </form>
+    <Board @fire="(coords) => sendMessage(OutgoingEvent.Fire, coords)" :fired-coords="firedCoordsList" />
   </div>
 </template>
