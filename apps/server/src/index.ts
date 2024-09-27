@@ -11,6 +11,19 @@ interface Player<Initial extends boolean> {
     ? ReturnType<typeof randomUUID>
     : ReturnType<typeof randomUUID> | null;
   ready: boolean;
+  ships?: {
+    position: {
+      start: {
+        x: number;
+        y: number;
+      };
+      end: {
+        x: number;
+        y: number;
+      };
+    };
+    length: number;
+  }[];
 }
 
 let games: Record<
@@ -44,7 +57,21 @@ type Payload =
     }
   | {
       type: "ready";
-      payload: null;
+      payload: {
+        ships: {
+          position: {
+            start: {
+              x: number;
+              y: number;
+            };
+            end: {
+              x: number;
+              y: number;
+            };
+          };
+          length: number;
+        }[];
+      };
     }
   | {
       type: "fire";
@@ -78,7 +105,6 @@ wss.on("connection", (ws) => {
             player2: { id: null, ready: false },
           };
         }
-        console.log("game", games);
         break;
       }
       case "ready": {
@@ -89,8 +115,10 @@ wss.on("connection", (ws) => {
         if (game) {
           if (game.player1.id === socketId) {
             game.player1.ready = true;
+            game.player1.ships = payload.ships;
           } else {
             game.player2.ready = true;
+            game.player2.ships = payload.ships;
           }
           if (game.player1.ready && game.player2.id && game.player2.ready) {
             // start the game
@@ -106,10 +134,28 @@ wss.on("connection", (ws) => {
             game.player1.id === socketId || game.player2.id === socketId
         )?.[1];
         if (game) {
-          const opponentId =
-            game.player1.id === socketId ? game.player2.id : game.player1.id;
-          if (opponentId) {
-            clients[opponentId].send(
+          const opponent =
+            game.player1.id === socketId ? game.player2 : game.player1;
+          if (opponent.id && opponent.ships) {
+            const shipIsHit = opponent.ships.some((ship) => {
+              const isHit =
+                ship.position.start.x <= payload.x &&
+                ship.position.end.x >= payload.x &&
+                ship.position.start.y <= payload.y &&
+                ship.position.end.y >= payload.y;
+              return isHit;
+            });
+            ws.send(
+              JSON.stringify({
+                type: "result",
+                payload: {
+                  x: payload.x,
+                  y: payload.y,
+                  hit: shipIsHit,
+                },
+              })
+            );
+            clients[opponent.id].send(
               JSON.stringify({ type: "player-fired", payload })
             );
           }

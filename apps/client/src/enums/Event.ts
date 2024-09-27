@@ -10,4 +10,5 @@ export enum IncomingEvent {
   PlayerReady = "player-ready",
   PlayerFired = "player-fired",
   PlayerAccepted = "player-accepted",
+  Result = "result",
 }
